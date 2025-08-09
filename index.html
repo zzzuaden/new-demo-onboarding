@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Melbourne Car Park Solution</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Leaflet (map) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- MarkerCluster (performance for many markers) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- Chart.js (Insights charts) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <!-- App logic as ES module so we can top-level await config -->
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <h1>Melbourne Car Park Solution</h1>
+      <nav class="top-nav">
+        <a href="#map">Real-Time Map</a>
+        <a href="#environment">Environment Options</a>
+        <a href="#insights">Melbourne Insights</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Project Overview -->
+    <section class="hero card">
+      <h2>Project Overview</h2>
+      <p>
+        Find parking near your destination and see live availability. We also suggest
+        environment-friendly options (public transport, walking, cycling) and provide insights
+        like busiest hours and average occupancy.
+      </p>
+    </section>
+
+    <!-- Destination Search -->
+    <section class="search card">
+      <label for="searchBox" class="label">Where do you want to go?</label>
+      <input id="searchBox" class="input" placeholder="Type a place (e.g., Federation Square)" />
+      <ul id="suggestions" class="suggestions" aria-live="polite"></ul>
+    </section>
+
+    <!-- Real-time Parking Map -->
+    <section id="map" class="map-section card">
+      <div class="section-head">
+        <h3 class="section-title">Real-Time Parking Map</h3>
+        <span id="status" class="muted">Type a destination to load nearby parking.</span>
+      </div>
+      <div id="leaflet" class="map"></div>
+      <div id="lotList" class="lot-list"></div>
+    </section>
+
+    <!-- Environment Options -->
+    <section id="environment" class="card env">
+      <h3 class="section-title">Environment-Friendly Choices</h3>
+      <p class="muted" id="envIntro">
+        Once you pick a destination, we’ll estimate distance and suggest greener travel options,
+        including an estimate of CO₂ saved compared with driving.
+      </p>
+      <div id="envSuggestions" class="env-grid"></div>
+    </section>
+
+    <!-- Insights -->
+    <section id="insights" class="card insights">
+      <h3 class="section-title">Melbourne Insights</h3>
+      <div class="charts">
+        <div class="chart">
+          <h4 class="chart-title">Average Occupancy by Car Park</h4>
+          <canvas id="avgOccChart" height="140"></canvas>
+        </div>
+        <div class="chart">
+          <h4 class="chart-title">Busiest Hours (Today)</h4>
+          <canvas id="busyHoursChart" height="140"></canvas>
+        </div>
+      </div>
+      <p class="muted small">
+        These use mock data now. When your backend is ready, wire them to <code>/api/v1/stats/parking</code>.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© 2025 Melbourne Car Park Solution • Frontend demo (mock backend)</small>
+    </div>
+  </footer>
+</body>
+</html>

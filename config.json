@@ -1,0 +1,4 @@
+{
+  "useMock": true,
+  "apiBase": "https://staging.api.example.com/api/v1"
+}
