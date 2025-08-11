@@ -1,16 +1,20 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 
-// 1) 搜索停车场（支持名称模糊 + 可选半径过滤）
+// 托管 fronted 文件夹作为静态资源
+app.use(express.static(path.join(__dirname, '../fronted')));
+
+// ===================== API 路由 =====================
+// 1) 搜索停车场
 app.get('/api/v1/parking', (req, res) => {
     const { dest = '', lat, lng, radius = 900 } = req.query;
 
-    // 多给几条数据更直观
     const data = [
         { id:'PARK001', name:'Flinders St Car Park',   lat:-37.8183, lng:144.9671, capacity:200, available:35 },
         { id:'PARK002', name:'Fed Square Parking',     lat:-37.8179, lng:144.9691, capacity:150, available:50 },
@@ -21,7 +25,6 @@ app.get('/api/v1/parking', (req, res) => {
 
     let results = data;
 
-    // 若传了经纬度，则按半径（米）过滤
     if (lat && lng) {
         const R = 6371000;
         const toRad = d => d * Math.PI / 180;
@@ -36,7 +39,6 @@ app.get('/api/v1/parking', (req, res) => {
         });
     }
 
-    // 同时支持名称模糊匹配（dest 可与半径一起用）
     const q = dest.toLowerCase().trim();
     if (q) {
         const tokens = q.split(/\s+/).filter(Boolean);
@@ -48,6 +50,7 @@ app.get('/api/v1/parking', (req, res) => {
 
     res.json(results);
 });
+
 // 2) 单个停车场详情
 app.get('/api/v1/parking/:id', (req, res) => {
     const { id } = req.params;
@@ -62,10 +65,10 @@ app.get('/api/v1/parking/:id', (req, res) => {
     if (!found) return res.status(404).json({ error: 'Not found' });
     res.json(found);
 });
-// 1b) 目的地地名搜索（简单内置表；返回 {items: [...] }）
+
+// 1b) 目的地地名搜索
 app.get('/api/v1/geo/search', (req, res) => {
   const q = (req.query.q || '').toString().toLowerCase().trim();
-  // Minimal place gazetteer for demo; expand as needed
   const places = [
     { name: 'Flinders Street', lat: -37.8183, lng: 144.9671 },
     { name: 'Flinders St Station', lat: -37.8183, lng: 144.9671 },
@@ -79,6 +82,7 @@ app.get('/api/v1/geo/search', (req, res) => {
   const items = q ? places.filter(p => p.name.toLowerCase().includes(q)) : places.slice(0, 5);
   res.json({ items });
 });
+
 // 2) 环保出行建议
 app.get('/api/v1/environment', (req, res) => {
     res.json({
@@ -102,4 +106,9 @@ app.get('/api/v1/stats/parking', (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+// 捕获所有非 API 请求，返回前端 index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../fronted/index.html'));
+});
+
+app.listen(PORT, () => console.log(`Backend + Frontend running on port ${PORT}`));
